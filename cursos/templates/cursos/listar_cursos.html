@@ -1,0 +1,60 @@
+{% extends 'cursos/base.html' %} {% load static %} {% block conteudo %}
+
+<section class="course-list center">
+  <!-- LISTA DE TODOS OS CURSOS-->
+  <form action=".">
+    <select name="ordenacao" id="ordenacao">
+      <option value="nome">Alfabética</option>
+      <option value="-nome">Invertida</option>
+    </select>
+    <input type="submit" value="Alterar Ordem" />
+  </form>
+  <ul>
+    {% for curso in cursos %}
+    <li class="course-item ma-3">
+      <div class="course">
+        <div class="course-image">
+          <img
+            src="{% if curso.imagem %}{{ curso.imagem}}{% else %}{% static 'cursos/imagens/dejavu_matrix.jpg' %}{% endif %}"
+            alt="Gato Preto"
+          />
+        </div>
+        <div class="course-info">
+          <h2 class="title mb-2">
+            {{ curso.nome }}
+            <span
+              ><a href="{% url 'cursos.alterar' curso.id %}">EDITAR</a></span
+            >
+          </h2>
+          <p class="description mb-2">{{ curso.descricao }}</p>
+          <p>
+            <a href="{% url 'cursos.listar.aulas' curso.id %}">Ver aulas</a>
+          </p>
+          <div class="course-actions pa-1">
+            <p class="badge keep-left bold">FREE</p>
+
+            <form action="{% url 'cursos.like' curso.id %}" method="POST">{% csrf_token %}
+              <span class="curso-like">
+                <button class="btn-like " type="submit"><i class="fa-solid fa-heart"></i>
+                </button>
+                <strong class="likes">?</strong>
+              </span>
+            </form>
+            <span>{{ curso.autor.nome }}</span>
+            <button class="btn btn-primary">Iniciar</button>
+          </div>
+        </div>
+      </div>
+    </li>
+    {% endfor %}
+    <li>
+      <a href="{% url 'cursos.novo' %}">CADASTRAR NOVO CURSO</a>
+    </li>
+  </ul>
+
+  <p>
+    <a href="{% url 'cursos.inicio' %}">Voltar para início</a>
+  </p>
+</section>
+
+{% endblock conteudo %}
