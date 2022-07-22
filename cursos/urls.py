@@ -9,4 +9,5 @@ urlpatterns = [
     path("alterar/<pk>", views.AlterarCursoView.as_view(), name="cursos.alterar"),
     path('', views.pagina_inicial, name='cursos.inicio'),
     path('like/<pk>', views.like_curso, name ='cursos.like'),
+    path('api/like/<pk>', views.api_like_curso, name='api.cursos.like')
 ]

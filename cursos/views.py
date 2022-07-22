@@ -1,9 +1,12 @@
+
+import json
 from webbrowser import get
-from django.shortcuts import get_object_or_404, reverse, render
+from django.shortcuts import get_object_or_404, redirect, reverse, render
 from django.views.generic.edit import CreateView, UpdateView
 from django.db.utils import IntegrityError
 from .models import Curso, CursosLike
 from .forms import CursoModelForm
+from django.http import HttpResponse, JsonResponse
 
 
 def pagina_inicial(request):
@@ -23,7 +26,8 @@ def listar_aulas(request, pk):
     curso = Curso.objects.get(id=pk)
     context = {
         "curso": curso,
-        "aulas": curso.aulas.all()
+        "aulas": curso.aulas.all(),
+        "likes": CursosLike.objects.filter(user=request.user), #estamos fazendo um where que procura os likes do usuario x pelo seu id
     }
     return render(request, 'cursos/listar_aulas.html', context)
 
@@ -47,13 +51,32 @@ class AlterarCursoView(CursoMixin, UpdateView):
 def like_curso(request, pk):
     curso = get_object_or_404(Curso, id = pk)
     try:
-        CursosLike.objects.create(user = request.user, curso = curso)
+        CursosLike.objects.create(user = request.user, curso=curso)
         context = {
             'mensagem':f'{curso.autor} Agradece!'
         }
     except IntegrityError as error:
-        CursosLike.objects.get(user = request.user, curso = curso).delete()
+        CursosLike.objects.get(user = request.user, curso=curso).delete()
         context = {
             'mensagem':':('
-        }     
-    return render(request, 'cursos/likeconcluido.html', context)
+        }
+    return redirect (reverse('cursos.listar.tudo'))
+    # return render(request, 'cursos/likeconcluido.html', context)
+
+def api_like_curso(request, pk):
+    curso = get_object_or_404(Curso, id=pk)
+    try: 
+        CursosLike.objects.create(user=request.user, curso=curso)
+        resposta = {
+            'like': True,
+        }
+
+    except IntegrityError as error:
+        CursosLike.objects.get(user=request.user, curso=curso).delete()
+        resposta = {
+            'like': False,
+        }
+
+    #return HttpResponse (resposta, content_type='application/json')
+    return JsonResponse (resposta)
+

@@ -45,7 +45,7 @@ class Aula(models.Model):
 
 class CursosLike(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    curso = models.ForeignKey(Curso, on_delete=models.CASCADE)
+    curso = models.ForeignKey(Curso, on_delete=models.CASCADE, related_name='likes')
     data = models.DateTimeField(auto_now_add=True)
 
     class Meta:
